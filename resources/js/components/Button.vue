@@ -1,13 +1,13 @@
 <template>
-    <div>
-        Click
-    </div>
+    <button @click="count++;">
+        Count:{{ count }}
+    </button>
 </template>
 
-<script>
-    export default {
+<script setup>
+import {ref} from 'vue'
+const count = ref(0)
 
-    }
 </script>
 
 <style lang="scss" scoped>
