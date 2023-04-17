@@ -12,7 +12,7 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    {{-- <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> --}}
 </head>
 
 
@@ -20,7 +20,6 @@
     <div id="app">
         <x-partials.navigation />
         {{ $slot }}
-        <button-vue />
     </div>
     {{-- <script src="https://unpkg.com/vue@3.2.47/dist/vue.global.js"></script>
 
