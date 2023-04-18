@@ -1,6 +1,6 @@
 <x-layouts.app title="Home">
     {{-- <x-slot:title>Home</x-slot> --}}
-    <h1 class="text-lg text-gray-800 text-center py-1 font-semibold">VNODE IMPLEMENTATION</h1>
+    <x-title>VNODE IMPLEMENTATION</x-title>
     <p class="text-md shadow-md py-2 px-1 border rounded mx-2 my-2 bg-blue-400 text-gray-100">Se requiere instalar la
         libería
         <a href="https://github.com/tiagolr/vnodes" target="_blank" class="underline font-semibold">vnodes</a> ademas
