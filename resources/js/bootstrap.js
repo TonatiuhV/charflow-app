@@ -13,13 +13,13 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 import { createApp } from 'vue'
 // import the root component App from a single-file component.
 import Button from './components/Button.vue'
-import Chartflow from './components/Chartflow.vue'
+import CharflowContainer from './components/CharflowContainer.vue'
 import Sink from './components/Sink.vue'
 
 const app = createApp({})
 
 app.component('ButtonVue', Button);
-app.component('CharflowVue', Chartflow);
+app.component('CharflowContainer', CharflowContainer);
 app.component('SinkVue', Sink);
 app.mount("#app");
 
