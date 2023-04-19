@@ -1,11 +1,36 @@
 
 <script setup>
 import { nextTick, onBeforeMount, ref } from "vue";
-import { Screen, Node, Edge, Group, graph } from "vnodes";
+import { Screen, Edge, graph } from "vnodes";
+import NodeInicio from "./NodeInicio.vue";
+import NodeNotificacion from "./NodeNotificacion.vue";
 
 const graphNode = ref(new graph());
 const groupNodes = ref(false);
+const inputValue = ref("");
 const screenNode = ref(null);
+const processNode = ref([
+  {
+    id: "1",
+    type: "NodeInicio",
+    data: {
+      name: "Incio",
+    },
+    children: [
+      {
+        id: "2",
+        type: "NodeNotificacion",
+        data: {
+          name: "Notificacion",
+        },
+        children: [],
+      },
+    ],
+  },
+]);
+
+//
+const nodesData = ref([]);
 
 onBeforeMount(() => {
   nextTick(() => {
@@ -15,10 +40,12 @@ onBeforeMount(() => {
 
 const createNodes = () => {
   graphNode.value.reset();
-  const GRAPH = [{ id: "1", children: [] }];
+  nodesData.value = [];
   const visitNode = (node, parent) => {
+    // const { children, ...rest } = node;
+
     if (!graphNode.value.nodes.find((n) => n.id === node.id)) {
-      graphNode.value.createNode(node.id);
+      graphNode.value.createNode({ ...node });
     }
     if (parent) {
       if (
@@ -26,12 +53,12 @@ const createNodes = () => {
           (c) => c.fromNode === parent.id && c.toNode === parent.id
         )
       ) {
-        graphNode.value.createEdge(parent.id, node.id);
+        graphNode.value.createEdge({ ...parent }, { ...node });
       }
     }
     node.children.forEach((c) => visitNode(c, node));
   };
-  GRAPH.forEach((n) => visitNode(n));
+  processNode.value.forEach((n) => visitNode(n));
   centerNodes();
 };
 
@@ -64,8 +91,25 @@ const zoomNodes = (scale = null) => {
 
   screenNode.value.zoomRect({ left, top, right, bottom }, { scale });
 };
+
+const getComponent = (type) => {
+  switch (type) {
+    case "NodeInicio":
+      return NodeInicio;
+    case "NodeNotificacion":
+      return NodeNotificacion;
+    default:
+      return NodeInicio;
+  }
+};
+
+const showNode = (event, node) => {
+  console.log(event, node);
+  alert("Click en node: " + node.data.name);
+};
 </script>
 <template>
+  <input type="text" class="w-full border py-1 px-1" v-model="inputValue" />
   <div class="col-span-3 h-screen">
     <screen ref="screenNode" :markers="[]">
       <edge
@@ -75,8 +119,13 @@ const zoomNodes = (scale = null) => {
         :key="edge.id"
       >
       </edge>
-
-      <node v-for="node in graphNode.nodes" :data="node" :key="node.id"> </node>
+      <component
+        v-for="node in graphNode.nodes"
+        :key="node.id"
+        :is="getComponent(node.type)"
+        :node="node"
+        @show="($event, node) => showNode($event, node)"
+      />
     </screen>
   </div>
 </template>
