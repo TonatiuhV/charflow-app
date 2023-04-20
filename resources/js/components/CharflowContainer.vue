@@ -1,14 +1,18 @@
 
 <script setup>
-import { nextTick, onBeforeMount, ref } from "vue";
+import { nextTick, onBeforeMount, reactive, ref } from "vue";
 import { Screen, Edge, graph } from "vnodes";
 import NodeInicio from "./NodeInicio.vue";
 import NodeNotificacion from "./NodeNotificacion.vue";
+import ContextmenuNode from "./ContextmenuNode.vue";
 
 const graphNode = ref(new graph());
 const groupNodes = ref(false);
 const inputValue = ref("");
 const screenNode = ref(null);
+const cntmenuNode = reactive({ open: false, event: {} });
+const selectNode = ref({});
+
 const processNode = ref([
   {
     id: "1",
@@ -107,10 +111,17 @@ const showNode = (event, node) => {
   console.log(event, node);
   alert("Click en node: " + node.data.name);
 };
+
+const showOptionsNode = (event, node) => {
+  cntmenuNode.event = event;
+  selectNode.value = node;
+  cntmenuNode.open = true;
+  //   alert("Click en node: " + node.data.name);
+};
 </script>
 <template>
-  <input type="text" class="w-full border py-1 px-1" v-model="inputValue" />
-  <div class="col-span-3 h-screen">
+  <input type="text" class="w-full px-1 py-1 border" v-model="inputValue" />
+  <div class="h-screen col-span-3">
     <screen ref="screenNode" :markers="[]">
       <edge
         v-for="edge in graphNode.edges"
@@ -125,8 +136,14 @@ const showNode = (event, node) => {
         :is="getComponent(node.type)"
         :node="node"
         @show="($event, node) => showNode($event, node)"
+        @contextmenu="($event, node) => showOptionsNode($event, node)"
       />
     </screen>
+    <contextmenu-node
+      :open="cntmenuNode.open"
+      :event="cntmenuNode.event"
+      :node="selectNode"
+    />
   </div>
 </template>
 
