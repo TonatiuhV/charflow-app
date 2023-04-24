@@ -1,6 +1,10 @@
 
 <script setup>
-import { nextTick, onMounted, ref, watchEffect } from "vue";
+import { nextTick, onMounted, onUnmounted, ref, watchEffect } from "vue";
+import ItemMenuContext from "./ItemMenuContext.vue";
+import ItemMenuContextDrawer from "./ItemMenuContextDrawer.vue";
+const emit = defineEmits(["close"]);
+
 const props = defineProps({
   open: {
     type: Boolean,
@@ -11,50 +15,68 @@ const props = defineProps({
     required: true,
   },
   event: {},
+  screenContainer: {
+    required: true,
+  },
 });
 
 const contextmenuNode = ref(null);
 
 const postionMenu = () => {
-  let x = props.event.offsetX,
-    y = props.event.offsetY,
-    winWidth = window.innerWidth / 2,
-    winHeight = window.innerHeight / 2,
-    cmWidth = contextmenuNode.value.offsetWidth,
-    cmHeight = contextmenuNode.value.offsetHeight;
-  console.log(cmHeight, cmWidth, x, y, winWidth, winHeight);
-  //   if (x > winWidth - cmWidth - shareMenu.offsetWidth) {
-  //     shareMenu.style.left = "-200px";
-  //   } else {
-  //     shareMenu.style.left = "";
-  //     shareMenu.style.right = "-200px";
-  //   }
-  x = x > winWidth - cmWidth ? winWidth - cmWidth - 5 : x;
-  y = y > winHeight - cmHeight ? winHeight - cmHeight - 5 : y;
+  const rect = props.screenContainer.getBoundingClientRect();
+  const postionCenterContainer = {
+    left: rect.left + window.scrollX + props.screenContainer.clientWidth / 2,
+    top: rect.top + window.scrollY + props.screenContainer.clientHeight / 2,
+  };
+  let x = postionCenterContainer.left + props.event.offsetX;
+  let y = props.event.offsetY + postionCenterContainer.top;
+  const cmHeight = contextmenuNode.value.offsetHeight;
 
-  console.log(x, y);
-  contextmenuNode.value.style.left = `${winWidth + props.node.x - cmHeight}px`;
-  contextmenuNode.value.style.top = `${winHeight + props.node.y + cmWidth}px`;
+  //   console.log(
+  //     "x: " + x,
+  //     "y: " + y,
+  //     "cmWidth: " + cmWidth,
+  //     "cmHeight: " + cmWidth
+  //   );
+  contextmenuNode.value.style.left = `${x + props.node.x - 15}px`;
+  contextmenuNode.value.style.top = `${y + props.node.y - 25}px`;
 };
 
 watchEffect(() => {
   if (props.open) {
     nextTick(() => {
-      console.log(contextmenuNode.value);
       postionMenu();
     });
   }
 });
+
+const closeOnEscape = (e) => {
+  if (props.open && e.keyCode === 27) {
+    emit("close");
+  }
+};
+
+onMounted(() => document.addEventListener("keydown", closeOnEscape));
+onUnmounted(() => document.removeEventListener("keydown", closeOnEscape));
 </script>
 <template>
   <Teleport to="body">
-    <div
-      ref="contextmenuNode"
-      v-if="open"
-      class="absolute z-50 w-20 bg-white border rounded shadow"
-    >
-      <p>Hello contentmenu!</p>
-      <button @click="open = false">Close</button>
+    <div v-if="open">
+      <div class="fixed inset-0 z-40" @click="emit('close')"></div>
+      <div
+        ref="contextmenuNode"
+        class="absolute z-50 bg-white border py-2 rounded-md shadow w-fit"
+      >
+        <ul class="cursor-pointer">
+          <ItemMenuContextDrawer>
+            <template #tigger> NUEVO NODO </template>
+            <template #content>
+              <ItemMenuContext class="relative">NOTIFICACION</ItemMenuContext>
+              <ItemMenuContext class="relative">CONDICION</ItemMenuContext>
+            </template>
+          </ItemMenuContextDrawer>
+        </ul>
+      </div>
     </div>
   </Teleport>
 </template>

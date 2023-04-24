@@ -14,6 +14,7 @@ console.log(props.node);
     <div
       class="px-3 py-1 cursor-pointer bg-blue-500 rounded"
       @dblclick="emits('show', $event, node)"
+      @contextmenu.prevent="emits('contextmenu', $event, node)"
     >
       <strong class="text-white">{{ node.data.name }}</strong>
     </div>

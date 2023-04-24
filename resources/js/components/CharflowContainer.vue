@@ -10,6 +10,7 @@ const graphNode = ref(new graph());
 const groupNodes = ref(false);
 const inputValue = ref("");
 const screenNode = ref(null);
+const screenContainer = ref(null);
 const cntmenuNode = reactive({ open: false, event: {} });
 const selectNode = ref({});
 
@@ -118,10 +119,14 @@ const showOptionsNode = (event, node) => {
   cntmenuNode.open = true;
   //   alert("Click en node: " + node.data.name);
 };
+const closeContextmenu = () => {
+  cntmenuNode.event = {};
+  selectNode.value = {};
+  cntmenuNode.open = false;
+};
 </script>
 <template>
-  <input type="text" class="w-full px-1 py-1 border" v-model="inputValue" />
-  <div class="h-screen col-span-3">
+  <div class="h-screen" ref="screenContainer">
     <screen ref="screenNode" :markers="[]">
       <edge
         v-for="edge in graphNode.edges"
@@ -142,7 +147,9 @@ const showOptionsNode = (event, node) => {
     <contextmenu-node
       :open="cntmenuNode.open"
       :event="cntmenuNode.event"
+      :screenContainer="screenContainer"
       :node="selectNode"
+      @close="closeContextmenu()"
     />
   </div>
 </template>
